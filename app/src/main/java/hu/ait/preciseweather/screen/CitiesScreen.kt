@@ -31,12 +31,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CitiesScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    citiesViewModel: CitiesViewModel = hiltViewModel()
 ) {
     Column() {
         TopAppBar(
