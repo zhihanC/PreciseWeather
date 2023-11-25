@@ -13,8 +13,8 @@ import retrofit2.http.Query
 // appid=642db3e6b246b9d67f9e1a92ec6645c7
 
 interface WeatherAPI {
-
-    @GET("api/latest")
-    suspend fun getForecast(@Query("access_key") accessKey: String): WeatherData
-
+    @GET("/data/2.5/weather")
+    suspend fun getWeatherData(@Query("q") cityName: String,
+                               @Query("units") units: String,
+                               @Query("appid") appId: String): WeatherData
 }
