@@ -16,7 +16,7 @@ import javax.inject.Inject
 class CitiesViewModel @Inject constructor(
     private val weatherAPI: WeatherAPI
 ) : ViewModel() {
-    private var _citiesList =
+    var _citiesList =
         mutableStateListOf<String>()
 
     fun getAllCitiesList(): List<String> {
