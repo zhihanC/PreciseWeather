@@ -10,6 +10,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import dagger.hilt.android.AndroidEntryPoint
 import hu.ait.preciseweather.screen.CitiesScreen
 import hu.ait.preciseweather.ui.theme.PreciseWeatherTheme
@@ -25,9 +31,24 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    CitiesScreen()
+                    PreciseWeatherNavHost()
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun PreciseWeatherNavHost(
+    modifier: Modifier = Modifier,
+    navController: NavHostController = rememberNavController(),
+    startDestination: String = "cities"
+) {
+    NavHost(
+        modifier = modifier, navController = navController, startDestination = startDestination
+    ) {
+        composable("cities") {
+            CitiesScreen()
         }
     }
 }
