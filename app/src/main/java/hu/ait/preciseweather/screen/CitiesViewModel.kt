@@ -29,6 +29,11 @@ class CitiesViewModel @Inject constructor(
         _citiesList.remove(city)
     }
 
+    fun deleteAllCities(): List<String> {
+        _citiesList.clear()
+        return _citiesList
+    }
+
     var weatherUIState: WeatherUiState by mutableStateOf(WeatherUiState.Init)
 
     fun getWeatherData(cityName: String, units: String, appId: String) {

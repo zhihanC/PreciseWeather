@@ -42,6 +42,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,6 +51,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.window.Dialog
+import hu.ait.preciseweather.data.WeatherData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,7 +72,7 @@ fun CitiesScreen(
             actions = {
                 IconButton(
                     onClick = {
-//                        shoppingListViewModel.deleteAllShoppingItems()
+                        citiesViewModel.deleteAllCities()
                     }
                 ) {
                     Icon(Icons.Filled.Delete, null)
@@ -78,7 +80,6 @@ fun CitiesScreen(
                 IconButton(
                     onClick = {
                         showAddCityDialog = true
-//                        shoppingItemToEdit = null
                     }
                 ) {
                     Icon(Icons.Filled.Add, null)
@@ -114,7 +115,8 @@ fun CitiesScreen(
 
 @Composable
 fun CityCard(
-    cityName: String
+    cityName: String,
+    citiesViewModel: CitiesViewModel = hiltViewModel()
 ) {
     Card(
         colors = CardDefaults.cardColors(
@@ -149,7 +151,7 @@ fun CityCard(
                 Spacer(modifier = Modifier.width(80.dp))
                 Icon(
                     imageVector = Icons.Filled.Info,
-                    contentDescription = "Indo",
+                    contentDescription = "Info",
 //                    modifier = Modifier.clickable {
 //                        onRemoveItem()
 //                    },
@@ -158,10 +160,10 @@ fun CityCard(
                 Icon(
                     imageVector = Icons.Filled.Delete,
                     contentDescription = "Delete",
-//                    modifier = Modifier.
-//                        .clickable {
-//                        onRemoveItem()
-//                    },
+                    modifier = Modifier
+                        .clickable {
+                        citiesViewModel.removeCity(cityName)
+                    },
                     tint = Color.Red
                 )
             }
@@ -173,7 +175,7 @@ fun CityCard(
 @OptIn(ExperimentalMaterial3Api::class)
 private fun AddNewCityForm(
     citiesViewModel: CitiesViewModel,
-    onDialogDismiss: () -> Unit = {},
+    onDialogDismiss: () -> Unit = {}
 ) {
     var context = LocalContext.current
 
@@ -191,28 +193,6 @@ private fun AddNewCityForm(
         var nameInputErrorState by rememberSaveable {
             mutableStateOf(false)
         }
-//
-//        fun validateTitle(text: String) {
-//            val isBlank = text.isBlank()
-//            titleErrorText = context.getString(R.string.please_enter_a_title)
-//            titleInputErrorState = isBlank
-//        }
-//
-//        var amountInputErrorState by rememberSaveable {
-//            mutableStateOf(false)
-//        }
-//
-//        var amountErrorText by rememberSaveable {
-//            mutableStateOf("")
-//        }
-//
-//        fun validateAmount(text: String) {
-//            val allDigit = text.all{char -> char.isDigit()}
-//            amountErrorText = context.getString(R.string.estimated_price_cannot_be_0)
-//            if (text == "0") {
-//                amountInputErrorState = true
-//            }
-//        }
 
         Column(
             Modifier
@@ -226,30 +206,29 @@ private fun AddNewCityForm(
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = cityName,
-//                isError = titleInputErrorState,
+                isError = nameInputErrorState,
                 onValueChange = {
                     cityName = it
-//                    validateTitle(shoppingItemTitle)
                 },
                 label = { Text(text = "Enter city name:") },
                 singleLine = true,
-//                supportingText = {
-//                    if (titleInputErrorState)
-//                        Text(
-//                            text = titleErrorText,
-//                            color = MaterialTheme.colorScheme.error,
-//                            style = MaterialTheme.typography.labelSmall,
-//                            modifier = Modifier.padding(start = 16.dp)
-//                        )
-//                },
-//                trailingIcon = {
-//                    if (titleInputErrorState) {
-//                        Icon(
-//                            Icons.Filled.Warning, "error",
-//                            tint = MaterialTheme.colorScheme.error
-//                        )
-//                    }
-//                }
+                supportingText = {
+                    if (nameInputErrorState)
+                        Text(
+                            text = nameErrorText,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.labelSmall,
+                            modifier = Modifier.padding(start = 16.dp)
+                        )
+                },
+                trailingIcon = {
+                    if (nameInputErrorState) {
+                        Icon(
+                            Icons.Filled.Warning, "error",
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
             )
 
             Row {
@@ -258,14 +237,20 @@ private fun AddNewCityForm(
                         if (cityName.isEmpty()) {
                             nameErrorText = "City name cannot be empty!"
                             nameInputErrorState = true
-                            // check for a valid API call here
-//                        } else if (shoppingItemEstimatedPrice.toString() == "0") {
-//                            amountErrorText = context.getString(R.string.estimated_price_cannot_be_0)
-//                            amountInputErrorState = true
+                        }
+
+                        // check for a valid API call here
+                        citiesViewModel.getWeatherData(cityName, "imperial", "642db3e6b246b9d67f9e1a92ec6645c7")
+
+                        // Bug: Failed API call is not recognized ...
+                        if (citiesViewModel.weatherUIState.Error) {
+                            nameErrorText = "API call did not succeed!"
+                            nameInputErrorState = true
                         } else {
                             citiesViewModel.addCity(cityName)
                             onDialogDismiss()
                         }
+
                     })
                 {
                     Text(text = "Save")
