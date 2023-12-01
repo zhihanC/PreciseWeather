@@ -18,6 +18,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import dagger.hilt.android.AndroidEntryPoint
 import hu.ait.preciseweather.screen.CitiesScreen
+import hu.ait.preciseweather.screen.WeatherScreen
 import hu.ait.preciseweather.ui.theme.PreciseWeatherTheme
 
 @AndroidEntryPoint
@@ -48,7 +49,25 @@ fun PreciseWeatherNavHost(
         modifier = modifier, navController = navController, startDestination = startDestination
     ) {
         composable("cities") {
-            CitiesScreen()
+            CitiesScreen(
+                onNavigateToSummary = {
+                    cityName -> navController.navigate(
+                        "weatherdata/$cityName"
+                    )
+                }
+            )
+        }
+        composable("weatherdata/{cityName}",
+            arguments = listOf(
+                navArgument("cityName"){type = NavType.StringType}
+            )
+        ) {
+            val cityName = it.arguments?.getString("cityName")
+            if (cityName != null) {
+                WeatherScreen(
+                    cityName = cityName
+                )
+            }
         }
     }
 }

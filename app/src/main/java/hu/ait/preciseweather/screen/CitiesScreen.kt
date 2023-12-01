@@ -46,18 +46,21 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.window.Dialog
 import hu.ait.preciseweather.data.WeatherData
+import kotlinx.coroutines.coroutineScope
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CitiesScreen(
     modifier: Modifier = Modifier,
-    citiesViewModel: CitiesViewModel = hiltViewModel()
+    citiesViewModel: CitiesViewModel = hiltViewModel(),
+    onNavigateToSummary: (String) -> Unit = {}
 ) {
 
     var showAddCityDialog by rememberSaveable {
@@ -104,7 +107,8 @@ fun CitiesScreen(
                 LazyColumn(modifier = Modifier.fillMaxHeight()) {
                     items(citiesList) {
                         CityCard(
-                            cityName = it
+                            cityName = it,
+                            onNavigateToSummary = onNavigateToSummary
                         )
                     }
                 }
@@ -116,8 +120,11 @@ fun CitiesScreen(
 @Composable
 fun CityCard(
     cityName: String,
-    citiesViewModel: CitiesViewModel = hiltViewModel()
+    citiesViewModel: CitiesViewModel = hiltViewModel(),
+    onNavigateToSummary: (String) -> Unit
 ) {
+    val coroutineScope = rememberCoroutineScope()
+
     Card(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant),
@@ -152,9 +159,12 @@ fun CityCard(
                 Icon(
                     imageVector = Icons.Filled.Info,
                     contentDescription = "Info",
-//                    modifier = Modifier.clickable {
-//                        onRemoveItem()
-//                    },
+                    modifier = Modifier.clickable {
+                        coroutineScope.launch {
+                            var cityName = cityName
+                            onNavigateToSummary(cityName)
+                        }
+                    },
                     tint = Color.Blue
                 )
                 Icon(
