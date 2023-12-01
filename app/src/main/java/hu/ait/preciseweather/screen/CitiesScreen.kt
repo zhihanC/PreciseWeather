@@ -237,20 +237,10 @@ private fun AddNewCityForm(
                         if (cityName.isEmpty()) {
                             nameErrorText = "City name cannot be empty!"
                             nameInputErrorState = true
-                        }
-
-                        // check for a valid API call here
-                        citiesViewModel.getWeatherData(cityName, "imperial", "642db3e6b246b9d67f9e1a92ec6645c7")
-
-                        // Bug: Failed API call is not recognized ...
-                        if (citiesViewModel.weatherUIState.Error) {
-                            nameErrorText = "API call did not succeed!"
-                            nameInputErrorState = true
                         } else {
                             citiesViewModel.addCity(cityName)
                             onDialogDismiss()
                         }
-
                     })
                 {
                     Text(text = "Save")
