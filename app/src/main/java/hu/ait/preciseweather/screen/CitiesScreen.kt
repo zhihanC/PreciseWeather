@@ -7,12 +7,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -40,10 +42,13 @@ import kotlinx.coroutines.launch
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -51,6 +56,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.window.Dialog
 import hu.ait.preciseweather.data.WeatherData
 import kotlinx.coroutines.coroutineScope
@@ -67,31 +73,53 @@ fun CitiesScreen(
         mutableStateOf(false)
     }
 
-    Column() {
-        TopAppBar(
-            title = { Text(text = "Precise Weather") },
-            colors = TopAppBarDefaults.smallTopAppBarColors(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer),
-            actions = {
-                IconButton(
-                    onClick = {
-                        citiesViewModel.deleteAllCities()
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(text = "Precise Weather") },
+                colors = TopAppBarDefaults.smallTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer),
+                actions = {
+                    IconButton(
+                        onClick = {
+                            citiesViewModel.deleteAllCities()
+                        }
+                    ) {
+                        Icon(Icons.Filled.Delete, null)
                     }
-                ) {
-                    Icon(Icons.Filled.Delete, null)
-                }
-                IconButton(
-                    onClick = {
-                        showAddCityDialog = true
+                    IconButton(
+                        onClick = {
+                            showAddCityDialog = true
+                        }
+                    ) {
+                        Icon(Icons.Filled.Add, null)
                     }
-                ) {
-                    Icon(Icons.Filled.Add, null)
                 }
+            )
+        },
+        bottomBar = {
+            BottomAppBar(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.primary,
+            ) {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                    text = "Add a city and check its weather!",
+                )
             }
-        )
-
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+                showAddCityDialog = true }) {
+                Icon(Icons.Default.Add, contentDescription = "Add")
+            }
+        }
+    ) { innerPadding ->
         Column(
-            modifier = modifier.padding(10.dp)
+            modifier = modifier.padding(innerPadding),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             var citiesList = citiesViewModel._citiesList
 
@@ -102,7 +130,10 @@ fun CitiesScreen(
             }
 
             if (citiesList.isEmpty())
-                Text(text = "No cities")
+                Text(
+                    text = "No cities",
+                    modifier = Modifier.padding(10.dp)
+                )
             else {
                 LazyColumn(modifier = Modifier.fillMaxHeight()) {
                     items(citiesList) {
@@ -254,6 +285,14 @@ private fun AddNewCityForm(
                     })
                 {
                     Text(text = "Save")
+                }
+                Spacer(modifier = Modifier.size(10.dp))
+                Button(
+                    onClick = {
+                        onDialogDismiss()
+                    })
+                {
+                    Text(text = "Cancel")
                 }
             }
         }
